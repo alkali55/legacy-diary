@@ -44,6 +44,7 @@ public class SendMailService {
 		props.put("mail.smtp.starttls.required", "true");
 		props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 		props.put("mail.smtp.auth", "true");
+//		props.put("mail.smtp.ssl.trust", "smtp.naver.com"); // could 머시기 오류 떳을때 추가?
 		
 		getAccount();
 		
