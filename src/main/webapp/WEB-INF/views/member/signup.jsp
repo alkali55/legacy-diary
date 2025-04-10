@@ -8,6 +8,9 @@
 <title>Insert title here</title>
 <script type="text/javascript">
 $(function(){
+// 	let count = 180;
+// 	let timer;
+// 	let stopper;
 	// 아이디 이벤트
 	$("#memberId").on("blur", function () {
 		let tmpMemberId = $("#memberId").val();
@@ -138,8 +141,15 @@ function callSendMail(){
           // 통신이 성공하면 수행할 함수
           console.log(data);
           if (data == "success"){
+        	  alert("이메일로 인증번호를 발송했습니다. 인증코드를 입력해주세요.")
+        	  
         	  if($(".authenticationDiv").length == 0){
         	  	showAuthenticateDiv(); // 인증번호를 입력받을 태그 요소를 출력
+        	  } else {
+//         		  $("#timeValid").val("checked");
+//         		  clearTimeout(timer);
+//         		  clearTimeout(stopper);
+//         		  doTimer();
         	  }
           }
           
@@ -154,41 +164,142 @@ function showAuthenticateDiv(){
 	
 	let authDiv = `
 		<div class="authenticationDiv mt-2">
-		<input type="text" class="form-control" id="memberAuthCode" placeholder="인증번호를 입력하세요.." />
-		<button type="button" class="btn btn-info" onclick="checkAuthCode();">인증하기</button>
+			<input type="text" class="form-control" id="memberAuthCode" placeholder="인증번호를 입력하세요.." />
+			<div class="d-flex align-items-center">
+			<span class="timer">3:00</span>
+			</div>
+			<button type="button" id="authBtn" class="btn btn-info" onclick="checkAuthCode();">인증하기</button>
 		</div>
 	`;
+			// <div id="timer" style="color: red;"></div><input type="hidden" id="timeValid" value="checked"/>
 	
 	$(authDiv).insertAfter("#email");
+	startTimer();
+	
+	
+	
+// 	doTimer();
+	
 }
 
-function checkAuthCode(){
-	let memberAuthCode = $("#memberAuthCode").val();
-// 	alert(memberAuthCode);
+let timeLeft = 180; // 초단위
+let intervalId = null;
+
+function startTimer(){
+	clearTimer();
 	
-	$.ajax({
-        url: '/member/checkAuthCode', // 데이터가 송수신될 서버의 주소
-        type: "POST", // 통신 방식 (GET, POST, PUT, DELETE)
-		  data: {
-			  "memberAuthCode" : memberAuthCode
-		  },  // 보내는 데이터
-        dataType: "text", // 수신받을 데이터 타입 (MIME TYPE) (text, json, xml)
-        // async: false, // 동기 통신 방식
-        success: function (data) {
-          // 통신이 성공하면 수행할 함수
-          console.log(data);
-          if (data == "success"){
-        	  outputError("인증완료", $("#email"), "green");
-        	  $(".authenticationDiv").remove();
-        	  $("#emailValid").val("checked");
-          }
-          
-          
-        },
-        error: function () {},
-        complete: function () {
-        },
-  	});
+// 	alert("타이머 동작!");
+	timeLeft = 180; // 시간 초기화
+	updateDisplay(timeLeft);
+	intervalId = setInterval(function(){
+		timeLeft--;
+		updateDisplay(timeLeft);
+		
+		if (timeLeft <= 0){
+			// 타이머 종료
+			clearTimer();
+			expiredTimer();
+		}
+	}, 1000);
+	
+	
+}
+
+function expiredTimer(){
+	// 인증 버튼 비활성화
+	$("authBtn").prop("disabled", true);
+	
+	// 타이머 종료시 백엔드에도 인증시간이 만료되었음을 알려야 한다.
+	if($("#emailValid").val() !== "checked"){
+		
+		$.ajax({
+	        url: '/member/clearAuthCode', // 데이터가 송수신될 서버의 주소
+	        type: "POST", // 통신 방식 (GET, POST, PUT, DELETE)
+	        dataType: "text", // 수신받을 데이터 타입 (MIME TYPE) (text, json, xml)
+	        // async: false, // 동기 통신 방식
+	        success: function (data) {
+	          // 통신이 성공하면 수행할 함수
+	          console.log(data);
+	          alert("인증시간이 만료되었습니다. 이메일 주소를 다시 입력하고 재인증해 주세요");
+	          $(".authenticationDiv").remove();
+	          $("#email").val("").focus();
+	          
+	        },
+	        error: function () {},
+	        complete: function () {
+	        },
+	  	});
+	}
+	
+	
+}
+
+function clearTimer(){
+	if (intervalId != null){
+		clearInterval(intervalId);
+	}
+}
+
+function updateDisplay(seconds){
+	// 시간 출력 3:00
+	
+	let min = Math.floor(seconds / 60);
+	let sec = String(seconds % 60).padStart(2, "0");
+	let remainTime = min + ":" + sec;
+	$(".timer").html(remainTime);
+}
+
+// function doTimer(){
+// 	count = 180;
+// 	let timerDate = new Date(count * 1000);
+// 	let timerString = `\${timerDate.getMinutes()} : \${timerDate.getSeconds()}`;
+// 	$("#timer").html(timerString);
+// 	timer = setInterval(test, 1000);
+// 	stopper = setTimeout(function(){
+// 		clearTimeout(timer);
+// 		$("#timer").html("인증시간이 만료되었습니다.");
+// 		$("#timeValid").val("");
+// 	}, 180000);
+// }
+
+// function test(){
+// 	count--;
+// 	let timerDate = new Date(count * 1000);
+// 	let timerString = `\${timerDate.getMinutes()} : \${timerDate.getSeconds()}`;
+// 	$("#timer").html(timerString);	
+// }
+
+function checkAuthCode(){
+// 	if($("#timeValid").val() == "checked"){
+		let memberAuthCode = $("#memberAuthCode").val();
+	// 	alert(memberAuthCode);
+		
+		$.ajax({
+	        url: '/member/checkAuthCode', // 데이터가 송수신될 서버의 주소
+	        type: "POST", // 통신 방식 (GET, POST, PUT, DELETE)
+			  data: {
+				  "memberAuthCode" : memberAuthCode
+			  },  // 보내는 데이터
+	        dataType: "text", // 수신받을 데이터 타입 (MIME TYPE) (text, json, xml)
+	        // async: false, // 동기 통신 방식
+	        success: function (data) {
+	          // 통신이 성공하면 수행할 함수
+	          console.log(data);
+	          if (data == "success"){
+	        	  outputError("인증완료", $("#email"), "green");
+	        	  $(".authenticationDiv").remove();
+	        	  $("#emailValid").val("checked");
+// 	        	  clearTimeout(timer);
+//         		  clearTimeout(stopper);
+	          }
+	          
+	          
+	        },
+	        error: function () {},
+	        complete: function () {
+	        },
+	  	});
+// 	}
 }
 
 
@@ -259,6 +370,9 @@ function isValid(){
 		
 }
 </script>
+<style>
+	.timer {color : red }
+</style>
 </head>
 <body>
 <jsp:include page="../header.jsp"></jsp:include>

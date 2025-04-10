@@ -67,7 +67,12 @@ public class SendMailService {
 			mime.addRecipient(RecipientType.TO, new InternetAddress(emailAddr)); // 받는 사람의 메일 주소
 			
 			mime.setSubject(subject);
-			mime.setText(message);
+//			mime.setText(message);
+			String html = "<h1>회원가입을 환영합니다.</h1>";
+			html += "<h2>회원가입을 환영합니다. 인증번호를 입력하시고 회원가입을 완료하세요</h2>";
+			html += "<h3>인증 코드 : </h3>";
+			html += "<h3>" + activationCode + "</h3>";
+			mime.setText(html, "utf-8", "html");
 			Transport.send(mime);
 		}
 		
