@@ -24,3 +24,26 @@ values(?, ?, ?, ?);
 --   `writer` VARCHAR(8) NOT NULL,
 --   `finished` TINYINT NULL DEFAULT '0',
 --   PRIMARY KEY (`dno`));
+
+insert into diary(title, dueDate, writer) values(?, ?, ?);
+
+use jis;
+select * from diary order by dno desc;
+
+update diary set finished = true where dno = 1;
+
+-- 다이어리 title, dueDate 수정
+update diary set title = ?, dueDate = ? where dno = ?;
+
+-- 로그인
+select * from member where memberId = ? and memberPwd = sha1(md5(?));
+
+-- memberId로 글 목록 조회
+select * from diary where writer = ?;
+
+-- 내일이 마감인 목록
+-- select * from diary where datediff(dueDate, now()) < 12;
+select * from diary where dueDate = date_add(curdate(), interval 1 day);
+
+-- 멤버아이디로 이메일 조회
+select email from member where memberId = ?;

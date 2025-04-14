@@ -16,4 +16,9 @@ public interface DiaryMapper {
 
 	int updateFinished(@Param("dno") int dno, @Param("finished") boolean finished);
 	
+	int updateDiary(DiaryVO diaryVO);
+
+	List<DiaryVO> selectAllListById(String memberId);
+	
+	List<DiaryVO> selectDiaryDueTomorrow();
 }

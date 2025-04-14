@@ -31,4 +31,17 @@ public class DiaryServiceImpl implements DiaryService {
 		return diarymapper.updateFinished(dno, finished);
 	}
 
+	@Override
+	public void modify(DiaryVO diaryVO) {
+		
+		diarymapper.updateDiary(diaryVO);
+	}
+
+	@Override
+	public List<DiaryVO> viewAll(String memberId) {
+		
+		
+		return diarymapper.selectAllListById(memberId);
+	}
+
 }
