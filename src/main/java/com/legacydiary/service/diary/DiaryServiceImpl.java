@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.legacydiary.domain.DiaryVO;
+import com.legacydiary.domain.SearchDTO;
 import com.legacydiary.mapper.DiaryMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,11 @@ public class DiaryServiceImpl implements DiaryService {
 		
 		
 		return diarymapper.selectAllListById(memberId);
+	}
+
+	@Override
+	public List<DiaryVO> searchDiary(SearchDTO searchDTO) {
+		return diarymapper.selectSearchList(searchDTO);
 	}
 
 }
