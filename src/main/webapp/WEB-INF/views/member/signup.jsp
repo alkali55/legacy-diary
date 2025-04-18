@@ -29,22 +29,12 @@ $(function(){
 			  data: {
 				  "tmpMemberId" : tmpMemberId
 			  },  // 보내는 데이터
-	          dataType: "json", // 수신받을 데이터 타입 (MIME TYPE)
+	          dataType: "text", // 수신받을 데이터 타입 (MIME TYPE)
 	          // async: false, // 동기 통신 방식
 	          success: function (data) {
 	            // 통신이 성공하면 수행할 함수
 	            console.log(data);
-	            if (data.msg == "duplicate") {
 	            
-	            	outputError("중복된 아이디입니다.", $("#memberId"), "red");
-	            	$("#memberId").focus();
-	            	$("#idValid").val("");
-	            	
-	            } else if (data.msg == "not duplicate") {
-					outputError("완료", $("#memberId"), "green");
-					$("#idValid").val("checked");
-	            	
-	            }
 	          },
 	          error: function () {},
 	          complete: function () {
@@ -182,6 +172,39 @@ function showAuthenticateDiv(){
 	
 }
 
+function checkAuthCode(){
+// 	if($("#timeValid").val() == "checked"){
+		let memberAuthCode = $("#memberAuthCode").val();
+	// 	alert(memberAuthCode);
+		
+		$.ajax({
+	        url: '/member/checkAuthCode', // 데이터가 송수신될 서버의 주소
+	        type: "POST", // 통신 방식 (GET, POST, PUT, DELETE)
+			  data: {
+				  "memberAuthCode" : memberAuthCode
+			  },  // 보내는 데이터
+	        dataType: "text", // 수신받을 데이터 타입 (MIME TYPE) (text, json, xml)
+	        // async: false, // 동기 통신 방식
+	        success: function (data) {
+	          // 통신이 성공하면 수행할 함수
+	          console.log(data);
+	          if (data == "success"){
+	        	  outputError("인증완료", $("#email"), "green");
+	        	  $(".authenticationDiv").remove();
+	        	  $("#emailValid").val("checked");
+// 	        	  clearTimeout(timer);
+//         		  clearTimeout(stopper);
+	          }
+	          
+	          
+	        },
+	        error: function () {},
+	        complete: function () {
+	        },
+	  	});
+// 	}
+}
+
 let timeLeft = 180; // 초단위
 let intervalId = null;
 
@@ -268,40 +291,6 @@ function updateDisplay(seconds){
 // 	let timerString = `\${timerDate.getMinutes()} : \${timerDate.getSeconds()}`;
 // 	$("#timer").html(timerString);	
 // }
-
-function checkAuthCode(){
-// 	if($("#timeValid").val() == "checked"){
-		let memberAuthCode = $("#memberAuthCode").val();
-	// 	alert(memberAuthCode);
-		
-		$.ajax({
-	        url: '/member/checkAuthCode', // 데이터가 송수신될 서버의 주소
-	        type: "POST", // 통신 방식 (GET, POST, PUT, DELETE)
-			  data: {
-				  "memberAuthCode" : memberAuthCode
-			  },  // 보내는 데이터
-	        dataType: "text", // 수신받을 데이터 타입 (MIME TYPE) (text, json, xml)
-	        // async: false, // 동기 통신 방식
-	        success: function (data) {
-	          // 통신이 성공하면 수행할 함수
-	          console.log(data);
-	          if (data == "success"){
-	        	  outputError("인증완료", $("#email"), "green");
-	        	  $(".authenticationDiv").remove();
-	        	  $("#emailValid").val("checked");
-// 	        	  clearTimeout(timer);
-//         		  clearTimeout(stopper);
-	          }
-	          
-	          
-	        },
-	        error: function () {},
-	        complete: function () {
-	        },
-	  	});
-// 	}
-}
-
 
 function outputError(errorMsg, tagObj, color) {
 	let errTag = $(tagObj).prev(); // <span></span>

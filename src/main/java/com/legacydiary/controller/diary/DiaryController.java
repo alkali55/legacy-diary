@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DiaryController {
 	
 	private final DiaryService diaryService;
+
 	
 	@GetMapping("/register")
 	public String registerForm(HttpSession session) {
