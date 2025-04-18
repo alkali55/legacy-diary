@@ -34,6 +34,9 @@ $(function(){
 	          success: function (data) {
 	            // 통신이 성공하면 수행할 함수
 	            console.log(data);
+				$("#idValid").val("checked");
+				outputError("사용가능한 아이디입니다", $("#memberId"), "green");
+
 	            
 	          },
 	          error: function () {},
